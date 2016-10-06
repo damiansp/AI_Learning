@@ -33,27 +33,12 @@ def is_valid_state(state):
 
 
 def act(action):
-    global world
     current_state = list(world)
-    c_to_cross = 0
-    m_to_cross = 0
-    c_on_land = 0
-    m_on_land = 0
+    c_to_cross = action.count('c')
+    m_to_cross = action.count('m')
+    c_on_land  = current_state[boat].count('c')
+    m_on_land  = current_state[boat].count('m')
 
-    for person in current_state[boat]:
-        if person == 'c':
-            c_on_land += 1
-        else:
-            m_on_land += 1
-
-    for person in action:
-        if person == 'c':
-            c_to_cross += 1
-        else:
-            m_to_cross += 1
-
-    print ('C crossing:', c_to_cross, 'M crossing:', m_to_cross, 'C on land:',
-           c_on_land, 'M on land:', m_on_land)
     # Check for invalid moves b/c required people not present
     if (c_to_cross > c_on_land) or (m_to_cross > m_on_land):
         return None
@@ -74,6 +59,6 @@ def act(action):
 
 
 # Test
-#for action in actions:
-#    print 'Action:',  action, '\nResult:', act(action), '\n'
+for action in actions:
+    print 'Action:',  action, '\nResult:', act(action), '\n'
 
