@@ -1,64 +1,77 @@
-# The Missionaries and Cannibals Problem
-# 3 missionaries and 3 cannibals are on one side of a river. Get all 6 to the
-# other side of the river with the following constraints:
-#   Only 2 people fit in the boat
-#   Cannibals cannot outnumber missionaries on either bank
+def get_boat_side(state):
+    if state[0][2] == 1:
+        return 0
+    return 1
 
-boat = 0 # 0: left side; 1: right side
-world = [['c', 'c', 'c', 'm', 'm', 'm'], []]
-goal = [[], ['c', 'c', 'c', 'm', 'm', 'm']]
-fringe = [world]
-visted_states = [world]
-actions = [['c'], ['c','c'], ['c', 'm'], ['m'], ['m', 'm']]
+# Test
+#print(get_boat_side([[0, 0, 0], [3, 3, 1]]))
+#print(get_boat_side([[3, 3, 1], [0, 0, 0]]))
 
-def is_valid_state(state):
-    for shore in [0, 1]:
-        if 'm' in state[shore]:
-            n_m = 0
-            n_c = 0
-            for person in state[shore]:
-                if person == 'm':
-                    n_m += 1
-                else:
-                    n_c += 1
-            if n_c > n_m:
-                return False
+
+def cross_river(state, n_cannibals, n_missionaries, boat_side):
+    new_state = [state[0][:], state[1][:]]
+    change = [n_cannibals, n_missionaries, 1]
+    for i, n in enumerate(change):
+        new_state[boat_side][i] -= n
+        new_state[1 - boat_side][i] += n
+    return new_state
+
+# Test
+#state = [[3, 3, 1], [0, 0, 0]]
+#print(cross_river(state, 1, 1, 0))
+#print(cross_river(state, 2, 0, 0))
+#state = [[1, 1, 0], [2, 2, 1]]
+#print(cross_river(state, 2, 0, 1))
+
+
+def is_legal(state):
+    for bank in state:
+        n_cannibals, n_missionaries = bank[0:2]
+        if n_cannibals and n_missionaries and n_cannibals > n_missionaries:
+            return False
     return True
 
 # Test
-#print is_valid_state(world)
-#print is_valid_state([['c', 'c', 'c'],['m', 'm', 'm']])
-#print is_valid_state([['c', 'm', 'm', 'c'], ['c', 'm']])
-#print is_valid_state([['c', 'm', 'c'], ['c', 'm', 'm']])
+#print(is_legal([[3, 3, 1], [0, 0, 0]]))
+#print(is_legal([[3, 1, 0], [0, 2, 1]]))
+    
 
-
-def act(action):
-    current_state = list(world)
-    c_to_cross = action.count('c')
-    m_to_cross = action.count('m')
-    c_on_land  = current_state[boat].count('c')
-    m_on_land  = current_state[boat].count('m')
-
-    # Check for invalid moves b/c required people not present
-    if (c_to_cross > c_on_land) or (m_to_cross > m_on_land):
-        return None
-
-    # Cross the river
-    for missionary in range(m_to_cross):
-        # For all arrays, c's come first, m's at the end:
-        current_state[boat] = current_state[boat][:-1]
-        current_state[1 - boat] += ['m']
-    for cannibal in range(c_to_cross):
-        current_state[boat] = current_state[boat][1:]
-        current_state[1 - boat] = ['c'] + current_state[1 - boat]
-
-    if is_valid_state(current_state):
-        return current_state
-    else:
-        return None
-
+def expand(state):
+    boat_side = get_boat_side(state)
+    cannibal_range = range(state[boat_side][0] + 1)
+    missionary_range = range(state[boat_side][1] + 1)
+    moves = [[c, m] for c in cannibal_range for m in missionary_range
+             if 0 < c + m < 3]
+    resulting_states = []
+    for move in moves:
+        c, m = move
+        resulting_state = (cross_river(state, c, m, boat_side))
+        if is_legal(resulting_state):
+            resulting_states.append(resulting_state)
+    return resulting_states
 
 # Test
-for action in actions:
-    print 'Action:',  action, '\nResult:', act(action), '\n'
+#print(expand([[3, 3, 1], [0, 0, 0]]))
+#print(expand([[2, 2, 0], [1, 1, 1]]))
 
+    
+def main():
+    goal_state = [[0, 0, 0], [3, 3, 1]]
+    unexplored_states = [[[3, 3, 1], [0, 0, 0]]]
+    explored_states =[]
+
+    while goal_state not in explored_states:
+        print('\nExplored States:')
+        for es in explored_states:
+            print(' ', es)
+        next_state_to_explore = unexplored_states.pop()
+        reachable_states = expand(next_state_to_explore)
+        explored_states.append(next_state_to_explore)
+        for state in reachable_states:
+            if state not in explored_states:
+                unexplored_states.append(state)
+
+    print('Goal state found!')
+
+
+main()
