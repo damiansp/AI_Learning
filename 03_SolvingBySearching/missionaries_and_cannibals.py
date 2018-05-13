@@ -1,7 +1,5 @@
 def get_boat_side(state):
-    if state[0][2] == 1:
-        return 0
-    return 1
+    return 0 if state[0][2] == 1 else 1
 
 # Test
 #print(get_boat_side([[0, 0, 0], [3, 3, 1]]))
