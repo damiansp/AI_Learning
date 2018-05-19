@@ -1,15 +1,18 @@
+import numpy as np
 from pprint import pprint
 
 UP    = [ 1,  0]
 DOWN  = [-1,  0]
 LEFT  = [ 0,  1]
 RIGHT = [ 0, -1]
+GOAL = [[1, 2, 3],
+        [4, 0, 5],
+        [6, 7, 8]]
 
-class Board():
-    def __init__(self):
-        self.state = [[1, 2, 3],
-                      [4, 0, 5],
-                      [6, 7, 9]]
+
+class Board:
+    def __init__(self, state):
+        self.state = state
         self.gap = self._get_gap()
 
     def __str__(self):
@@ -35,9 +38,29 @@ class Board():
         except KeyError:
             print('Cannot move that direction')
 
+class Game:
+    def __init__(self):
+        self.goal = Board(GOAL)
+        self.initial_state = self._make_random_board()
+        self.explored_states = []
+        self.unexplored_states = []
+
+    def _make_random_board(self):
+        dim = len(self.goal.state)
+        tiles = list(range(dim * dim))
+        np.random.shuffle(tiles)
+        return [tiles[(i*dim):(i*dim + dim)] for i in range(dim)]
+
+    def get_all_successive_states(self):
+        pass
+
+game = Game()
+print(game.initial_state)
+            
+
 
 def main():
-    board = Board()
+    board = Board(GOAL)
     print(board)
     board.move(UP)
     print(board)
