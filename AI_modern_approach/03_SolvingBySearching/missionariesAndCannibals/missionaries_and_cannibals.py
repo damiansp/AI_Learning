@@ -57,7 +57,6 @@ def main():
     goal_state = [[0, 0, 0], [3, 3, 1]]
     unexplored_states = [[[3, 3, 1], [0, 0, 0]]]
     explored_states =[]
-
     while goal_state not in explored_states:
         print('\nExplored States:')
         for es in explored_states:
@@ -68,8 +67,8 @@ def main():
         for state in reachable_states:
             if state not in explored_states:
                 unexplored_states.append(state)
-
     print('Goal state found!')
 
 
-main()
+if __name__ == '__main__':
+    main()
